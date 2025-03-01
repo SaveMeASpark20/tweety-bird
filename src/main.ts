@@ -50,3 +50,8 @@ app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
 
+/*
+/opt/render/.cache/puppeteer/chrome
+/opt/render/.cache/puppeteer/chrome/puppeteer/chrome
+/opt/render/.cache/puppeteer/chrome/linux-133.0.6943.126/chrome-linux64/chrome
+*/

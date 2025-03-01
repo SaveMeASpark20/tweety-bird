@@ -5,7 +5,7 @@ import fs from 'fs';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-(async () => {
+const scrape = async () => {
   try {
     console.log("Launching Puppeteer...");
 
@@ -28,7 +28,7 @@ const PORT = process.env.PORT || 3000;
   } catch (error: any) {
     console.error("❌ Puppeteer failed:", error.message);
   }
-})();
+};
 
 const CACHE_DIR = "/opt/render/.cache/puppeteer";
 
@@ -42,6 +42,7 @@ app.get("/check-cache", (req, res) => {
 });
 
 app.get("/", (req, res) => {
+  scrape();
   res.send("Puppeteer is running on Render!");
 });
 

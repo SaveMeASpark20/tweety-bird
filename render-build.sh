@@ -19,8 +19,8 @@ find "$PUPPETEER_CACHE_DIR" -type f || echo "No files found"
 npx puppeteer browsers install chrome
 
 echo "✅ Puppeteer and Chrome installed"
-echo "🔍 Checking Puppeteer Cache Directory after installation:"
-find "$PUPPETEER_CACHE_DIR" -type f || echo "No files found"
+echo "🔍 Searching for Chrome binary..."
+find / -name "chrome" 2>/dev/null
 
 # Avoid copying the directory into itself
 if [[ -d "$PUPPETEER_CACHE_DIR/chrome" ]]; then

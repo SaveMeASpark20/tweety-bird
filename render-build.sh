@@ -17,10 +17,10 @@ echo "✅ Puppeteer and Chrome installed"
 
 # Get the correct Chrome binary path
 CHROME_DIR=$(npx puppeteer browsers path chrome)
-CHROME_PATH="$CHROME_DIR/linux-*/chrome-linux64/chrome"
+CHROME_PATH=$(find "$CHROME_DIR" -type f -name "chrome" | head -n 1)
 
 # Validate if Chrome exists
-if [[ ! -f "$CHROME_PATH" ]]; then
+if [[ -z "$CHROME_PATH" ]]; then
     echo "❌ Error: Chrome binary not found!"
     exit 1
 fi

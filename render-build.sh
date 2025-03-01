@@ -26,8 +26,8 @@ echo "✅ Using Puppeteer executable path: $PUPPETEER_EXECUTABLE_PATH"
 # Store/pull Puppeteer cache with build cache
 if [[ -d "$PUPPETEER_CACHE_DIR" ]]; then
     echo "🔄 Storing Puppeteer Cache in Build Cache"
-    cp -R $PUPPETEER_CACHE_DIR /opt/render/project/src/.cache/puppeteer/chrome/
+    cp -R $PUPPETEER_CACHE_DIR /opt/render/.cache/puppeteer/chrome/
 else
     echo "📥 Copying Puppeteer Cache from Build Cache"
-    cp -R /opt/render/project/src/.cache/puppeteer/chrome/ $PUPPETEER_CACHE_DIR
+    cp -R /opt/render/.cache/puppeteer/chrome/ $PUPPETEER_CACHE_DIR
 fi

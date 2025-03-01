@@ -10,6 +10,8 @@ const scrape = async () => {
     console.log("Launching Puppeteer...");
 
     const browser = await puppeteer.launch({
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+      headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
 

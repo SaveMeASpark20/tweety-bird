@@ -11,18 +11,20 @@ const PORT = process.env.PORT || 3000;
 
     const browser = await puppeteer.launch({
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      executablePath: "/opt/render/.cache/puppeteer/chrome/linux-133.0.6943.126/chrome-linux64/chrome",
+      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
     });
 
-
+    console.log("✅ Puppeteer started successfully!");
 
     const page = await browser.newPage();
     await page.goto("https://example.com");
 
-    console.log("Taking a screenshot...");
     await page.screenshot({ path: "screenshot.png" });
 
-    console.log("✅ Puppeteer is working!");
+    console.log("📸 Screenshot taken!");
+
+    await browser.close();
   } catch (error: any) {
     console.error("❌ Puppeteer failed:", error.message);
   }

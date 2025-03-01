@@ -12,22 +12,19 @@ npm run build
 PUPPETEER_CACHE_DIR=/opt/render/.cache/puppeteer
 mkdir -p "$PUPPETEER_CACHE_DIR"
 
-echo "🔍 Checking Puppeteer Cache Directory:"
-find "$PUPPETEER_CACHE_DIR" -type f || echo "No files found"
-
 # Install Puppeteer and download Chrome
 npx puppeteer browsers install chrome
 
 echo "🔍 Checking Puppeteer Cache Directory:"
 find /opt/render/.cache/puppeteer/ -type f
 
-# Store/pull Puppeteer cache with build cache
-if [[ -d "$PUPPETEER_CACHE_DIR/chrome" ]]; then
-    echo "🔄 Storing Puppeteer Cache in Build Cache"
-    cp -R "$PUPPETEER_CACHE_DIR/chrome" /opt/render/.cache/puppeteer/
-else
+echo "🔍 Searching for Chrome..."
+find / -name "chrome" 2>/dev/null
+
+# Store/pull Puppeteer cache with build cache only if needed
+if [[ ! -d "/opt/render/.cache/puppeteer/chrome" ]]; then
     echo "📥 Copying Puppeteer Cache from Build Cache"
-    cp -R /opt/render/.cache/puppeteer/chrome "$PUPPETEER_CACHE_DIR"
+    cp -R "$PUPPETEER_CACHE_DIR" /opt/render/.cache/
+else
+    echo "✅ Puppeteer Cache already exists, skipping copy."
 fi
-
-

@@ -1,25 +1,30 @@
 #!/usr/bin/env bash
-#exit on error
+# Exit on error
 set -o errexit
 
-#Install dependencies
+# Install dependencies
 npm install
 
-# Uncomment this line if you need to build your project
+# Build the project (optional, uncomment if needed)
 npm run build
-# Ensure the Puppeteer cache directory exists
-PUPPETEER_CACHE_DIR=/opt/render/.cache/puppeteer
-mkdir -p $PUPPETEER_CACHE_DIR
+
+# Define Puppeteer cache directory
+PUPPETEER_CACHE_DIR="/opt/render/.cache/puppeteer"
+CHROME_PATH="$PUPPETEER_CACHE_DIR/chrome"
+
+# Ensure Puppeteer cache directory exists
+mkdir -p "$PUPPETEER_CACHE_DIR"
 
 # Install Puppeteer and download Chrome
+echo "📥 Installing Puppeteer and Chrome..."
 npx puppeteer browsers install chrome
 
-# Store/pull Puppeteer cache with build cache
-if [[ ! -d $PUPPETEER_CACHE_DIR ]]; then
-echo "...Copying Puppeteer Cache from Build Cache"
-# Copying from the actual path where Puppeteer stores its Chrome binary
-cp -R /opt/render/.cache/puppeteer/chrome/ $PUPPETEER_CACHE_DIR
+# Find Chrome's actual path
+CHROME_EXECUTABLE=$(find "$CHROME_PATH" -name "chrome" 2>/dev/null | head -n 1)
+
+if [[ -n "$CHROME_EXECUTABLE" ]]; then
+    echo "✅ Chrome found at: $CHROME_EXECUTABLE"
 else
-echo "...Storing Puppeteer Cache in Build Cache"
-cp -R $PUPPETEER_CACHE_DIR /opt/render/.cache/puppeteer/chrome/
+    echo "❌ Chrome not found!"
+    exit 1
 fi

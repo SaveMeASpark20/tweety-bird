@@ -15,16 +15,15 @@ mkdir -p "$PUPPETEER_CACHE_DIR"
 # Install Puppeteer and download Chrome
 npx puppeteer browsers install chrome
 
-echo "🔍 Checking Puppeteer Cache Directory:"
-find /opt/render/.cache/puppeteer/ -type f
-
 echo "🔍 Searching for Chrome..."
 find / -name "chrome" 2>/dev/null
 
-# Store/pull Puppeteer cache with build cache only if needed
-if [[ ! -d "/opt/render/.cache/puppeteer/chrome" ]]; then
-    echo "📥 Copying Puppeteer Cache from Build Cache"
-    cp -R "$PUPPETEER_CACHE_DIR" /opt/render/.cache/
+
+# Store/pull Puppeteer cache with build cache
+if [[ -d "$PUPPETEER_CACHE_DIR" ]]; then
+    echo "🔄 Storing Puppeteer Cache in Build Cache"
+    cp -R $PUPPETEER_CACHE_DIR /opt/render/.cache/puppeteer/chrome/
 else
-    echo "✅ Puppeteer Cache already exists, skipping copy."
+    echo "📥 Copying Puppeteer Cache from Build Cache"
+    cp -R /opt/render/.cache/puppeteer/chrome/ $PUPPETEER_CACHE_DIR
 fi

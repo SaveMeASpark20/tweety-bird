@@ -11,7 +11,7 @@ const scrape = async () => {
 
     const browser = await puppeteer.launch({
       headless: true,
-      executablePath: "/opt/google/chrome/chrome",
+      executablePath: "/opt/render/.cache/puppeteer/chrome",
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
 

@@ -7,7 +7,7 @@
     "build": "tsc --build",
     "start": "node ./dist/main.js",
     "start:dev": "nodemon ./src/main.ts",
-    "postinstall": "npx puppeteer browser install chrome"
+    "postinstall": "npx puppeteer browsers install chrome"
   },
   "keywords": [],
   "author": "",

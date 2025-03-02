@@ -42,3 +42,5 @@ if [[ -n "$MISSING_LIBS" ]]; then
 else
     echo "✅ All required dependencies are installed!"
 fi
+
+ls -R /opt/render/.cache/puppeteer/chrome

@@ -10,6 +10,7 @@ app.get("/", async (req, res)  =>  {
     console.log("Launching Puppeteer...");
     console.log("Executable Path: ", puppeteer.executablePath());
     const browser = await puppeteer.launch({
+      executablePath: "/opt/render/.cache/puppeteer/chrome/linux-133.0.6943.126/chrome-linux64/chrome",
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });

@@ -31,3 +31,14 @@ fi
 # Export Chrome path for Puppeteer
 export PUPPETEER_EXECUTABLE_PATH="$CHROME_PATH"
 echo "✅ PUPPETEER_EXECUTABLE_PATH set to: $PUPPETEER_EXECUTABLE_PATH"
+
+echo "🔍 Checking for missing dependencies..."
+MISSING_LIBS=$(ldd "$CHROME_PATH" | grep "not found" || true)
+
+if [[ -n "$MISSING_LIBS" ]]; then
+    echo "🚨 Missing dependencies detected:"
+    echo "$MISSING_LIBS"
+
+else
+    echo "✅ All required dependencies are installed!"
+fi

@@ -43,4 +43,5 @@ else
     echo "✅ All required dependencies are installed!"
 fi
 
-ls -R /opt/render/.cache/puppeteer/chrome
+ls -l /opt/render/.cache/puppeteer/chrome/linux-133.0.6943.126/chrome-linux64/
+

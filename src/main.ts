@@ -15,18 +15,19 @@ const scrape = async () => {
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
 
-    console.log("✅ Puppeteer started successfully!");
+    return "✅ Puppeteer started successfully!";
 
-    const page = await browser.newPage();
-    await page.goto("https://example.com");
+    // const page = await browser.newPage();
+    // await page.goto("https://example.com");
 
-    await page.screenshot({ path: "screenshot.png" });
+    // await page.screenshot({ path: "screenshot.png" });
 
-    console.log("📸 Screenshot taken!");
+    // console.log("📸 Screenshot taken!");
 
-    await browser.close();
+    // await browser.close();
   } catch (error: any) {
     console.error("❌ Puppeteer failed:", error.message);
+    return `❌ Puppeteer failed: ${error.message}`;
   }
 };
 
@@ -42,8 +43,9 @@ app.get("/check-cache", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  scrape();
-  res.send("Puppeteer is running on Render!");
+  const browser =  scrape();
+
+  res.send(browser);
 });
 
 app.listen(PORT, () => {

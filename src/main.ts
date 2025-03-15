@@ -9,9 +9,11 @@ const app = express();
 
 app.get("/", (req : Request, res : Response) => {
     try{
-        scrape();
+        const tweets = scrape();
+        res.send(tweets);
     }catch(err : any){        
         console.log(err.mesage);
+        res.json({error: err.message});
     }
 })
 

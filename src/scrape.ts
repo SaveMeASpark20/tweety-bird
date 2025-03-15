@@ -2,6 +2,7 @@ import puppeteer from "puppeteer-core";
 import { config } from "./config";
 import {getLatestTweetDate, insertTweetDB } from "./db";
 import { Post } from "./type";
+
 import "dotenv/config";  // Automatically loads .env file
 
 
@@ -115,7 +116,6 @@ async function getXAccountLatestPost(
         url,
         handle
         });
-        console.log("1. created_at : ", created_at, "latestTweetDate :",  latestTweetDate);
       }
     }
   });
@@ -128,8 +128,9 @@ async function getXAccountLatestPost(
   return tweets;
 }
 
-export async function scrape() {
+export async function scrape() : Promise<Post[]> {
   try {
+    let tweets: Post[] = [];
     const listXAccounts = config.xAccounts;
 
     for (const { handle, name } of listXAccounts) {
@@ -142,11 +143,12 @@ export async function scrape() {
           const insertTweet = await insertTweetDB(post);  // ✅ No scope issue
           if (insertTweet) {
             console.log(`Tweet inserted successfully`);
+            tweets.push(post);
           }
         }
       }
-      
     }
+    return tweets
   } catch (error: any) { 
     throw new Error(`Something went wrong: ${error.message}`);
   }

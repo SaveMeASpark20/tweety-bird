@@ -152,20 +152,4 @@ export async function scrape() {
   }
 }
 
-let isRunning = false;
 
-async function runMain() {
-  if (isRunning) return; // Prevent overlapping executions
-  isRunning = true;
-  try {
-    await scrape();
-  } catch (error) {
-    console.error("Error in main function:", error);
-  } finally {
-    isRunning = false;
-  }
-}
-
-// Run immediately, then every 5 minutes
-runMain();
-setInterval(runMain, 5 * 60 * 1000);

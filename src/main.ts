@@ -7,9 +7,9 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 
-app.get("/", (req : Request, res : Response) => {
+app.get("/", async (req : Request, res : Response) => {
     try{
-        const tweets = scrape();
+        const tweets = await scrape();
         res.send(tweets);
     }catch(err : any){        
         console.log(err.mesage);

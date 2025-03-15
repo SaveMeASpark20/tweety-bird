@@ -1,4 +1,3 @@
-import { executablePath } from "puppeteer-core";
 
 export const config = {
     browserConfig :{

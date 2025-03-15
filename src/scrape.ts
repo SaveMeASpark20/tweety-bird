@@ -11,7 +11,14 @@ let browser: any;
 async function initBrowser() {
   if (browser) return; 
   browser = await puppeteer.launch({
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium"
+    args: [
+      "--disable-setuid-sandbox",
+      "--no-sandbox",
+      "--single-process",
+      "--no-zygote",
+    ],
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
+    headless: true,
   });
 }
 

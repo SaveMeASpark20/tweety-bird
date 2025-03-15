@@ -1,6 +1,6 @@
 FROM node:20-slim
-
 # Install Chromium
+
 RUN apt-get update && apt-get install -y \
   chromium \
   ca-certificates \
@@ -31,13 +31,24 @@ RUN apt-get update && apt-get install -y \
   && rm -rf /var/lib/apt/lists/*
 
 # Set Puppeteer’s Chromium path
+
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 WORKDIR /app
+
 COPY package.json package-lock.json ./
-RUN npm install --omit=dev && npm run build
-COPY . .
+
+RUN npm install
+
+COPY . . 
+
+# Run build before pruning devDependencies
+
+RUN npm run build && npm prune --omit=dev
+
+CMD ["node", "dist/main.js"]
+
 
 EXPOSE 10000
-CMD ["node", "dist/main.js"]

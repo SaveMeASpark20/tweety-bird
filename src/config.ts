@@ -2,7 +2,7 @@ import { executablePath } from "puppeteer-core";
 
 export const config = {
     browserConfig :{
-        headless: false,
+        headless: true,
         args : [      
             "--disable-setuid-sandbox",
             "--no-sandbox",
@@ -10,7 +10,7 @@ export const config = {
             "--no-zygote",
         ],
         //executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-        executablePath : process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium-browser",
+        executablePath : process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
     },
 
     xAccounts :  [

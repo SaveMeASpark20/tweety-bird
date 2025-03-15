@@ -2,7 +2,7 @@ import { executablePath } from "puppeteer-core";
 
 export const config = {
     browserConfig :{
-        headless: true,
+        headless: "true",
         args : [      
             "--disable-setuid-sandbox",
             "--no-sandbox",

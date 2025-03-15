@@ -11,7 +11,6 @@ let browser: any;
 async function initBrowser() {
   if (browser) return; 
   browser = await puppeteer.launch({
-    headless: config.browserConfig.headless || true,
     executablePath: config.browserConfig.executablePath,
   });
 }

@@ -11,7 +11,7 @@ let browser: any;
 async function initBrowser() {
   if (browser) return; 
   browser = await puppeteer.launch({
-    executablePath: config.browserConfig.executablePath,
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium"
   });
 }
 

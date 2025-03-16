@@ -10,11 +10,12 @@ async function initBrowser() {
   if (browser) return;
   try {
     browser = await puppeteer.launch({
-      headless: config.browserConfig.headless || true,
+      headless: false,  // Run in headful mode for debugging
       executablePath: config.browserConfig.executablePath,
       args: config.browserConfig.args,
       timeout: 60000,  // Increase timeout
     });
+    console.log("Browser launched successfully");
   } catch (error) {
     console.error("Failed to launch browser:", error);
     throw error;
@@ -102,12 +103,14 @@ async function getXAccountLatestPost(name: string, handle: string): Promise<Post
   });
 
   try {
+    console.log(`Navigating to https://x.com/${handle}`);
     await page.goto(`https://x.com/${handle}`, { waitUntil: "load", timeout: 60000 });
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));  // Wait for 5 seconds
   } catch (error) {
     console.error("Failed to navigate to page:", error);
   } finally {
     await page.close();
+    console.log("Page closed");
   }
 
   return tweets;
@@ -137,6 +140,7 @@ export async function scrape() {
   } finally {
     if (browser) {
       await browser.close();
+      console.log("Browser closed");
     }
   }
 }

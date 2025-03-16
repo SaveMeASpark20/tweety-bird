@@ -4,3 +4,4 @@ dist/
 src/chrome-user-data/
 src/myUserDataDir/
 cookies.json
+.env

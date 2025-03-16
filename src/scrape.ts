@@ -19,8 +19,8 @@ async function initBrowser() {
         "--single-process",
         "--no-zygote",
       ],
-      executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\Chrome.exe",
-      headless: false,
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
+      headless: true,
       protocolTimeout: 60000
     });
     // Handle browser disconnection

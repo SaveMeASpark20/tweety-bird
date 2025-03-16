@@ -7,15 +7,15 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 
-app.get("/", async (req : Request, res : Response) => {
-    try{
+app.get("/", async (req: Request, res: Response) => {
+    try {
         const tweets = await scrape();
-        res.send(tweets);
-    }catch(err : any){        
-        console.log(err.mesage);
-        res.json({error: err.message});
+        res.status(200).send(tweets); // Explicitly set status code for success
+    } catch (err: any) {
+        console.error("Error:", err.message); // Use console.error for errors
+        res.status(500).json({ error: err.message }); // Set appropriate status code for errors
     }
-})
+});
 
 app.listen(PORT, () => {
     console.log(`Running on PORT ${PORT}`);

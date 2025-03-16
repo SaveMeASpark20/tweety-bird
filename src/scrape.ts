@@ -101,7 +101,7 @@ async function getXAccountLatestPost(
       const media_url = entry?.content?.itemContent?.tweet_results.result?.legacy?.extended_entities?.media[0].media_url_https;
       const profile = entry?.content?.itemContent?.tweet_results?.result.core?.user_results?.result?.legacy?.profile_image_url_https;
       const created_at = new Date(entry.content.itemContent.tweet_results.result.legacy.created_at);
-      const url = `https://x.com/${handle}/${entry.entryId.split("-")[1]}`;
+      const url = entry?.content?.itemContent?.tweet_results.result?.legacy?.extended_entities?.media[0].expanded_url;
 
       //get the latest tweet the created_at on the databe compare it to the created_at of the tweet by the handle of it
       console.log({id, sortIndex, full_text, media_url, profile, created_at, url, handle});

@@ -10,28 +10,34 @@ import "dotenv/config";  // Automatically loads .env file
 let browser: any;
 
 async function initBrowser() {
-  if (browser) return; 
-  browser = await puppeteer.launch({
-    args: [
-      "--disable-setuid-sandbox",
-      "--no-sandbox",
-      "--single-process",
-      "--no-zygote",
-    ],
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
-    headless: true,
-  });
+  if (browser) return;
+  try {
+    browser = await puppeteer.launch({
+      args: [
+        "--disable-setuid-sandbox",
+        "--no-sandbox",
+        "--single-process",
+        "--no-zygote",
+      ],
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
+      headless: true,
+    });
+    // Handle browser disconnection
+    browser.on("disconnected", () => {
+      console.log("Browser disconnected. Restarting...");
+      browser = null; // Reset browser to allow reinitialization
+    });
+  } catch (err) {
+    console.error("Failed to initialize browser:", err);
+    throw err;
+  }
 }
 
-async function getXAccountLatestPost(
-  name: string,
-  handle: string
-): Promise<Post[]> {
+async function getXAccountLatestPost(name: string, handle: string): Promise<Post[]> {
   if (!name || !handle) return [];
 
   await initBrowser();
-  const latestTweetDate =  await getLatestTweetDate(handle)
-
+  const latestTweetDate = await getLatestTweetDate(handle);
 
   const userAgents = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -47,84 +53,89 @@ async function getXAccountLatestPost(
       path: "/",
       httpOnly: true,
       secure: true,
-      sameSite: "Lax"
-    }
+      sameSite: "Lax",
+    },
   ];
 
   const page = await browser.newPage();
-
   const randomUserAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
-
-  // Set the User-Agent
   await page.setUserAgent(randomUserAgent);
-
-
-
-  await page.setCookie(...cookies)
-
-
-  await page.setRequestInterception(true);
-  page.on("request", (request: any) => request.continue());
+  await page.setCookie(...cookies);
 
   let tweets: Post[] = [];
 
-  page.on("response", async (response: any) => {
-    if (response.status() !== 200) return;
+  try {
+    await page.setRequestInterception(true);
+    page.on("request", (request: any) => request.continue());
 
-    const url = response.url();
-    if (!url.includes("UserTweets")) return;
+    page.on("response", async (response: any) => {
+      try {
+        if (response.status() !== 200) return;
 
-    const contentType = response.headers()["content-type"];
-    if (!contentType || !contentType.includes("application/json")) {
-      return;
-    }
+        const url = response.url();
+        if (!url.includes("UserTweets")) return;
 
-    const body  = await response.json();
-    const instructions =
-      body.data?.user?.result?.timeline_v2?.timeline?.instructions;
-    if (!instructions) return;
+        const contentType = response.headers()["content-type"];
+        if (!contentType || !contentType.includes("application/json")) return;
 
-    const timelineEntries = instructions
-      .filter((inst :any) => inst.type === "TimelineAddEntries")
-      .flatMap((inst : any) => inst.entries);
-    
-    
-    timelineEntries.forEach((entry : any) => {
-      if (
-        entry?.content?.itemContent?.tweet_results &&
-        entry.entryId &&
-        entry.sortIndex
-      ) {
-      const id = entry.entryId;
-      const sortIndex = entry.sortIndex;
-      const full_text = entry?.content?.itemContent?.tweet_results?.result?.legacy?.full_text;
-      const media_url = entry?.content?.itemContent?.tweet_results.result?.legacy?.extended_entities?.media[0].media_url_https;
-      const profile = entry?.content?.itemContent?.tweet_results?.result.core?.user_results?.result?.legacy?.profile_image_url_https;
-      const created_at = new Date(entry.content.itemContent.tweet_results.result.legacy.created_at);
-      const url = entry?.content?.itemContent?.tweet_results.result?.legacy?.extended_entities?.media[0].expanded_url;
+        const body = await response.json();
+        if (!body.data?.user?.result?.timeline_v2?.timeline?.instructions) {
+          console.error("Invalid response structure");
+          return;
+        }
 
-      //get the latest tweet the created_at on the databe compare it to the created_at of the tweet by the handle of it
-      console.log({id, sortIndex, full_text, media_url, profile, created_at, url, handle});
-      if( !latestTweetDate || created_at > new Date(latestTweetDate)) {
-        tweets.push({ 
-        id,
-        sortIndex,
-        full_text,
-        media_url,
-        profile,
-        created_at : created_at.toISOString(),
-        url,
-        handle
+        const instructions = body.data.user.result.timeline_v2.timeline.instructions;
+        const timelineEntries = instructions
+          .filter((inst: any) => inst.type === "TimelineAddEntries")
+          .flatMap((inst: any) => inst.entries);
+
+        timelineEntries.forEach((entry: any) => {
+          if (entry?.content?.itemContent?.tweet_results && entry.entryId && entry.sortIndex) {
+            const id = entry.entryId;
+            const sortIndex = entry.sortIndex;
+            const full_text = entry?.content?.itemContent?.tweet_results?.result?.legacy?.full_text;
+            const media_url = entry?.content?.itemContent?.tweet_results.result?.legacy?.extended_entities?.media[0]?.media_url_https;
+            const profile = entry?.content?.itemContent?.tweet_results?.result?.core?.user_results?.result?.legacy?.profile_image_url_https;
+            const created_at = new Date(entry.content.itemContent.tweet_results.result.legacy.created_at);
+            const url = entry?.content?.itemContent?.tweet_results.result?.legacy?.extended_entities?.media[0]?.expanded_url;
+
+            if (!latestTweetDate || created_at > new Date(latestTweetDate)) {
+              tweets.push({
+                id,
+                sortIndex,
+                full_text,
+                media_url,
+                profile,
+                created_at: created_at.toISOString(),
+                url,
+                handle,
+              });
+            }
+          }
         });
+      } catch (err) {
+        console.error("Error parsing response:", err);
       }
+    });
+
+    console.log(`Navigating to https://x.com/${handle}...`);
+    await page.goto(`https://x.com/${handle}`, { waitUntil: "networkidle2" });
+
+    // Wait for the specific API response
+    try {
+      await page.waitForResponse(
+        (response : any) => response.url().includes("UserTweets"),
+        { timeout: 10000 }
+      );
+    } catch (err) {
+      console.error("Timed out waiting for API response:", err);
     }
-  });
-});
+  } catch (err) {
+    console.error("Error fetching tweets:", err);
+  } finally {
+    await page.close();
+  }
 
-  await page.goto(`https://x.com/${handle}`, { waitUntil: "load" });
-  await new Promise((resolve) => setTimeout(resolve, 5000));
-
-  await page.close();
   return tweets;
 }
 

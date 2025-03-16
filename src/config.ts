@@ -8,8 +8,8 @@ export const config = {
             "--single-process",
             "--no-zygote",
         ],
-        executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-        //executablePath : process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
+        //executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+        executablePath : process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
     },
 
     xAccounts :  [

@@ -21,6 +21,7 @@ async function initBrowser() {
       ],
       executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
       headless: true,
+      protocolTimeout: 60000
     });
     // Handle browser disconnection
     browser.on("disconnected", () => {

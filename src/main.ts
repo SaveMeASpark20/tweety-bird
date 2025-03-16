@@ -10,7 +10,7 @@ const app = express();
 app.get("/", async (req: Request, res: Response) => {
     try {
         const tweets = await scrape();
-        res.status(200).send(tweets); // Explicitly set status code for success
+        res.status(200).json({"scrape" : "working"}); // Explicitly set status code for success
     } catch (err: any) {
         console.error("Error:", err.message); // Use console.error for errors
         res.status(500).json({ error: err.message }); // Set appropriate status code for errors

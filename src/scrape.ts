@@ -13,6 +13,7 @@ async function initBrowser() {
   browser = await puppeteer.launch({
     headless: config.browserConfig.headless || true,
     executablePath: config.browserConfig.executablePath,
+    args : config.browserConfig.args
   });
 }
 

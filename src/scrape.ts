@@ -19,8 +19,8 @@ async function initBrowser() {
         "--single-process",
         "--no-zygote",
       ],
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
-      headless: true,
+      executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\Chrome.exe",
+      headless: false,
       protocolTimeout: 60000
     });
     // Handle browser disconnection
@@ -46,6 +46,7 @@ async function getXAccountLatestPost(name: string, handle: string): Promise<Post
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/537.36 (KHTML, like Gecko) Version/16.2 Mobile/15E148 Safari/537.36",
   ];
+  console.log(process.env.COOKIES_VALUE)
   const cookies = [
     {
       name: "auth_token",
@@ -61,8 +62,13 @@ async function getXAccountLatestPost(name: string, handle: string): Promise<Post
   const page = await browser.newPage();
   const randomUserAgent = userAgents[Math.floor(Math.random() * userAgents.length)];
   await page.setUserAgent(randomUserAgent);
-  await page.setCookie(...cookies);
+  console.log("Cookies before setting:", await page.cookies());
 
+  // Set cookies
+  await page.setCookie(...cookies);
+  
+  // Log cookies after setting
+  console.log("Cookies after setting:", await page.cookies());
   let tweets: Post[] = [];
 
   try {
@@ -71,11 +77,10 @@ async function getXAccountLatestPost(name: string, handle: string): Promise<Post
 
     page.on("response", async (response: any) => {
       try {
-        if (response.status() !== 200) return;
+        if (response.status() !== 200) return; 
 
         const url = response.url();
         if (!url.includes("UserTweets")) return;
-
         const contentType = response.headers()["content-type"];
         if (!contentType || !contentType.includes("application/json")) return;
 
@@ -114,6 +119,7 @@ async function getXAccountLatestPost(name: string, handle: string): Promise<Post
             }
           }
         });
+
       } catch (err) {
         console.error("Error parsing response:", err);
       }

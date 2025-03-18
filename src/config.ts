@@ -1,15 +1,16 @@
 
 export const config = {
     browserConfig :{
-        headless: true,
+        headless: false,
         args : [      
             "--disable-setuid-sandbox",
             "--no-sandbox",
             "--single-process",
             "--no-zygote",
+            
         ],
-        //executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-        executablePath : process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
+        executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+        //executablePath : process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
     },
 
     xAccounts :  [

@@ -10,7 +10,7 @@ async function initBrowser() {
   if (browser) return;
   try {
     browser = await puppeteer.launch({
-      headless: false,  // Run in headful mode for debugging
+      headless: config.browserConfig.headless,  // Run in headful mode for debugging
       executablePath: config.browserConfig.executablePath,
       args: config.browserConfig.args,
       timeout: 600000,  // Increase timeout

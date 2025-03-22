@@ -6,10 +6,13 @@ import { Post } from "../type";
 
 let db: Database<sqlite3.Database> | null = null;
 
+const dbPath = process.env.DATABASE_PATH || "/dist/db/tweet.db"; // Default to dist
+
+
 export const initDB = async () => {
     if (!db) {
         db = await open({
-            filename: "src/db/tweet.db",
+            filename: dbPath,
             driver: sqlite3.Database,
         });
 
@@ -63,11 +66,21 @@ export async function insertTweetDB(tweetData: Post) {
 }
 
 export async function getLatestTweetDate(handle: string): Promise<Date | null> {
-    const db = await initDB(); // Your SQLite connection
-    const row = await db.get(
-      "SELECT created_at FROM tweet WHERE handle = ? ORDER BY created_at DESC LIMIT 1",
-      [handle]
-    );
-    return row ? row.created_at : null;
+    try {
+        const db = await initDB(); // Your SQLite connection
+        if(!db) {
+            console.log("db not initialize")
+            return null
+        }
+        const row = await db.get(
+          "SELECT created_at FROM tweet WHERE handle = ? ORDER BY created_at DESC LIMIT 1",
+          [handle]
+        );
+        console.log(row)
+        return row ? row.created_at : null;
+    } catch (error : any) {
+     console.log("Error:", error)
+     return null   
+    }
   }
   

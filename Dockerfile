@@ -91,8 +91,7 @@
   # Set environment variables
   ENV NODE_ENV=production
   ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
-  ENV DATABASE_PATH=/app/dist/db/tweet.db
-  ENV COOKIES_VALUE=a6a66355d27787f390fdf45fd8c7b7d8f7abb9a0
+
   # Expose the port
   EXPOSE 10000
   

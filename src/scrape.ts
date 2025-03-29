@@ -3,6 +3,7 @@ import { config } from "./config";
 import { getLatestTweetDate, insertTweetDB } from "./db";
 import { Post } from "./type";
 import "dotenv/config";  // Automatically loads .env file
+import { initializeDiscord, sendMessageOnDiscord } from "./discord";
 
 let browser: Browser | null = null;
 
@@ -151,10 +152,19 @@ async function getXAccountLatestPost(name: string, handle: string): Promise<Post
 
 export async function scrape() : Promise<Post[]>{
   try {
+    const channel = process.env.CHANNEL;
+    const botToken = process.env.BOT_TOKEN;
+    if( !channel || !botToken ) {
+      console.log('Channel and token of bot is necessary to initialize the discord')
+      return [] 
+    }
+
+    await initializeDiscord()
+
     const listXAccounts = config.xAccounts;
     let tweets : Post[] = []
     for (const { handle, name } of listXAccounts) {
-      console.log(`Fetching tweets for @${handle}...`);
+      console.log(`Fetching tweets for @${handle}...`); 
       const posts = await getXAccountLatestPost(name, handle);
 
       for (const post of posts) {
@@ -162,12 +172,18 @@ export async function scrape() : Promise<Post[]>{
           console.log(post);
           const insertTweet = await insertTweetDB(post);
           if (insertTweet) {
-            console.log(`Tweet inserted successfully`);
-            tweets.push(post);
+            let message = ''
+            if(post.media_url)
+              message = 'Hey @'+ post.handle + "\n" + 'tweeted : '  + post.url + '\n' + post.full_text  + "\n" + post.media_url
+            else 
+              message = 'Hey @'+ post.handle + "\n"  + 'tweeted : '+ post.url + '\n' + post.full_text  
+            await sendMessageOnDiscord(channel, message)
           }
         }
       }
     }
+
+
 
     return tweets
 
@@ -176,3 +192,11 @@ export async function scrape() : Promise<Post[]>{
     throw new Error(`Something went wrong: ${error.message}`); 
   }
 }
+
+setInterval(() => {
+  scrape().catch((err) => {
+    console.error('Scraping error:', err.message);
+  });
+}, 1000 * config.xAccounts.length * 60 * 5);
+
+scrape()

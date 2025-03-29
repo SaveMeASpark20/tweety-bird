@@ -150,13 +150,13 @@ async function getXAccountLatestPost(name: string, handle: string): Promise<Post
   }
 }
 
-export async function scrape() : Promise<Post[]>{
+export async function scrape() : Promise<boolean>{
   try {
     const channel = process.env.CHANNEL;
     const botToken = process.env.BOT_TOKEN;
     if( !channel || !botToken ) {
       console.log('Channel and token of bot is necessary to initialize the discord')
-      return [] 
+      return false
     }
 
     await initializeDiscord()
@@ -182,10 +182,7 @@ export async function scrape() : Promise<Post[]>{
         }
       }
     }
-
-
-
-    return tweets
+    return true
 
   } catch (error: any) {
     console.error("Error during scraping:", error);

@@ -193,10 +193,3 @@ export async function scrape() : Promise<Post[]>{
   }
 }
 
-setInterval(() => {
-  scrape().catch((err) => {
-    console.error('Scraping error:', err.message);
-  });
-}, 1000 * config.xAccounts.length * 60 * 5);
-
-scrape()

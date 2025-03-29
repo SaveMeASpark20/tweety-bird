@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import "dotenv/config";  // Automatically loads .env file
 import { scrape } from './scrape';
+import { config } from './config';
 
 const PORT = process.env.PORT || 10000;
 
@@ -16,15 +17,14 @@ app.get("/", async (req: Request, res: Response) => {
     }
 });
 
-app.get("/scrape", async (req : Request, res : Response) => {
-    try {
-        const tweets = await scrape();
-        res.status(200).json({tweets}); 
-    } catch (err: any) {
-        console.error("Error:", err.message);
-        res.status(500).json({ error: err.message }); 
-    }
-})
+
+setInterval(() => {
+  scrape().catch((err) => {
+    console.error('Scraping error:', err.message);
+  });
+}, 1000 * config.xAccounts.length * 60 * 5);
+
+scrape()
 
 app.listen(PORT, () => {
     console.log(`Running on PORT ${PORT}`);

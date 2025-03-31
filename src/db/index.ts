@@ -37,10 +37,10 @@ export const initDB = async () => {
 
 
 
-export async function insertTweetDB(tweetData: Post) {
+export async function insertTweetDB(tweetData: Post) : Promise<boolean> {
     try {
         const database = await initDB();
-
+        console.log(database);
         const query = `
             INSERT INTO tweet (id, sortIndex, full_text, media_url, profile, created_at, url, handle)
             VALUES ($id, $sortIndex, $full_text, $media_url, $profile, $created_at, $url, $handle);
@@ -83,4 +83,19 @@ export async function getLatestTweetDate(handle: string): Promise<Date | null> {
      return null   
     }
   }
+
+export async function getTweets() : Promise<Post[]> {
+    try {
+        const db = await initDB(); // Your SQLite connection
+        if(!db) {
+            console.log("db not initialize")
+            return []
+        }
+        const rows : Post[] = await db.all("SELECT * FROM tweet ORDER BY CREATED_AT DESC") || []
+        return rows
+    } catch (error) {
+        console.log("Error fetching tweets: ", error)
+        return []
+    }
+}
   

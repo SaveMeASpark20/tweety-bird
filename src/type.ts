@@ -1,5 +1,5 @@
 export type Post = {
-    id: string;
+    tweet_id: string;
     sortIndex: number;
     full_text: string;
     media_url?: string;

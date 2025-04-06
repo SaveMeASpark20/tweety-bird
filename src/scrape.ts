@@ -1,9 +1,9 @@
 import puppeteer, { Browser } from "puppeteer-core";
 import { config } from "./config";
-import { getLatestTweetDate, insertTweetDB } from "./db";
 import { Post } from "./type";
 import "dotenv/config";  // Automatically loads .env file
 import { initializeDiscord, sendMessageOnDiscord } from "./discord";
+import { getLatestTweetDate, postTweet } from "./controller";
 
 let browser: Browser | null = null;
 
@@ -50,6 +50,7 @@ async function getXAccountLatestPost(name: string, handle: string): Promise<Post
     }
 
     const latestTweetDate = await getLatestTweetDate(handle);
+    console.log("Latest Tweet Date : " + latestTweetDate)
     const userAgents = [
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -97,35 +98,40 @@ async function getXAccountLatestPost(name: string, handle: string): Promise<Post
       }
 
       const body = await response.json();
-      const instructions = body.data?.user?.result?.timeline_v2?.timeline?.instructions;
-      if (!instructions) return;
+      
 
+      const instructions = body.data?.user?.result?.timeline?.timeline?.instructions;
+      if (!instructions){
+        return;
+      } 
+          
       const timelineEntries = instructions
         .filter((inst: any) => inst.type === "TimelineAddEntries")
         .flatMap((inst: any) => inst.entries);
-
       timelineEntries.forEach((entry: any) => {
         if (entry?.content?.itemContent?.tweet_results && entry.entryId && entry.sortIndex) {
-          const id = entry.entryId;
+          const tweet_id = entry.entryId;
+
           const sortIndex = entry.sortIndex;
           const full_text = entry?.content?.itemContent?.tweet_results?.result?.legacy?.full_text;
           const media_url = entry?.content?.itemContent?.tweet_results.result?.legacy?.extended_entities?.media[0].media_url_https;
           const profile = entry?.content?.itemContent?.tweet_results?.result.core?.user_results?.result?.legacy?.profile_image_url_https;
           const created_at = new Date(entry.content.itemContent.tweet_results.result.legacy.created_at);
+          console.log(created_at)
           const url = `https://x.com/${handle}/status/${entry.entryId.split("-")[1]}`;
-
-          if (!latestTweetDate || created_at > new Date(latestTweetDate)) {
+          console.log("created_at : ", created_at, "latestTweetDate :", latestTweetDate);
+          if (!latestTweetDate || new Date(created_at) > new Date(latestTweetDate)) {
             tweets.push({
-              id,
+              tweet_id,
               sortIndex,
               full_text,
               media_url,
               profile,
-              created_at: created_at.toISOString(),
+              created_at : created_at.toISOString(),
               url,
               handle
             });
-            console.log("1. created_at : ", created_at, "latestTweetDate :", latestTweetDate);
+            console.log("Successfully compile the tweet");
           }
         }
       });
@@ -134,7 +140,7 @@ async function getXAccountLatestPost(name: string, handle: string): Promise<Post
     try {
       console.log(`Navigating to https://x.com/${handle}`);
       await page.goto(`https://x.com/${handle}`, { waitUntil: "load", timeout: 600000 });
-      await new Promise((resolve) => setTimeout(resolve, 25000));  // Wait for 15 seconds
+      await new Promise((resolve) => setTimeout(resolve, 15000));  // Wait for 15 seconds
     } catch (error) {
       console.error("Failed to navigate to page:", error);
     } finally {
@@ -165,12 +171,14 @@ export async function scrape() : Promise<boolean>{
     let tweets : Post[] = []
     for (const { handle, name } of listXAccounts) {
       console.log(`Fetching tweets for @${handle}...`); 
+      console.log(name, handle)
       const posts = await getXAccountLatestPost(name, handle);
 
       for (const post of posts) {
-        if (post.id && post.sortIndex && post.profile && post.created_at && post.url && post.handle) {
+        if (post.tweet_id && post.sortIndex && post.profile && post.created_at && post.url && post.handle) {
           console.log(post);
-          const insertTweet = await insertTweetDB(post);
+          const insertTweet = await postTweet(post);
+          console.log(insertTweet)
           if (insertTweet) {
             let message = ''
             if(post.media_url)

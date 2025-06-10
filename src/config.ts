@@ -14,20 +14,12 @@ export const config = {
 
     xAccounts :  [
         {
-            name : "Crossmint",
-            handle : "crossmint",
-        },
-        {
             name : "wallstreetbets",
             handle : "wallstreetbets",
         },
         {
             name : "CoinTelegraph",
             handle : "CoinTelegraph",
-        },
-        {
-            name : "K A L E O",
-            handle : "CryptoKaleo",
         },
         {
             name : "Base",

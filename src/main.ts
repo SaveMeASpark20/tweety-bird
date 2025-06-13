@@ -1,7 +1,8 @@
 import express, { Request, Response } from 'express';
 import "dotenv/config";  // Automatically loads .env file
 import { scrape } from './scrape';
-import tweetRouter from './router'
+import connectToDb from './db/connectDb';
+
 
 const PORT = process.env.PORT || 10000;
 
@@ -27,9 +28,10 @@ app.get("/scrape", async (req : Request, res : Response) => {
     }
 })
 
-app.use("/api/twitter", tweetRouter);
 
 
-app.listen(PORT, () => {
+
+app.listen(PORT, async ()  => {
+    await connectToDb()
     console.log(`Running on PORT ${PORT}`);
 })

@@ -12,3 +12,7 @@ export async function connectDB() {
     return connection;
 }
   
+//awtspaindev
+//jNTkbExdsZqQm8fh
+//npm install mongoose
+//mongodb+srv://awtspaindev:jNTkbExdsZqQm8fh@tweet.f1rwsxx.mongodb.net/?retryWrites=true&w=majority&appName=tweet

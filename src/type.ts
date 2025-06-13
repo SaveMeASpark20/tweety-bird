@@ -1,6 +1,6 @@
-export type Post = {
+export type Tweet = {
     tweet_id: string;
-    sortIndex: number;
+    sortIndex: string;
     full_text: string;
     media_url?: string;
     profile: string;

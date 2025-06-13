@@ -1,7 +1,7 @@
 
 export const config = {
     browserConfig :{
-        headless: true,
+        headless: false,
         args : [      
             "--disable-setuid-sandbox",
             "--no-sandbox",

@@ -1,6 +1,6 @@
 import puppeteer, { Browser } from "puppeteer-core";
 import { config } from "./config";
-import { Post } from "./type";
+import { Tweet } from "./type";
 import "dotenv/config";  // Automatically loads .env file
 import { initializeDiscord, sendMessageOnDiscord } from "./discord";
 import { getLatestTweetDate, postTweet } from "./controller";
@@ -35,7 +35,7 @@ async function initBrowser() : Promise <boolean> {
   }
 }
 
-async function getXAccountLatestPost(name: string, handle: string): Promise<Post[]> {
+async function getXAccountLatestPost(name: string, handle: string): Promise<Tweet[]> {
   try {
     
     if (!name || !handle) return [];
@@ -84,7 +84,7 @@ async function getXAccountLatestPost(name: string, handle: string): Promise<Post
     await page.setRequestInterception(true);
     page.on("request", (request: any) => request.continue());
 
-    let tweets: Post[] = [];
+    let tweets: Tweet[] = [];
 
     page.on("response", async (response: any) => {
       if (response.status() !== 200) return;
@@ -111,16 +111,19 @@ async function getXAccountLatestPost(name: string, handle: string): Promise<Post
       timelineEntries.forEach((entry: any) => {
         if (entry?.content?.itemContent?.tweet_results && entry.entryId && entry.sortIndex) {
           const tweet_id = entry.entryId;
+          console.log("tweet_id" + tweet_id)
 
           const sortIndex = entry.sortIndex;
           const full_text = entry?.content?.itemContent?.tweet_results?.result?.legacy?.full_text;
           const media_url = entry?.content?.itemContent?.tweet_results.result?.legacy?.extended_entities?.media[0].media_url_https;
           const profile = entry?.content?.itemContent?.tweet_results?.result.core?.user_results?.result?.legacy?.profile_image_url_https;
           const created_at = new Date(entry.content.itemContent.tweet_results.result.legacy.created_at);
-          console.log(created_at)
+          //console.log(created_at)
           const url = `https://x.com/${handle}/status/${entry.entryId.split("-")[1]}`;
           console.log("created_at : ", created_at, "latestTweetDate :", latestTweetDate);
-          if (!latestTweetDate || new Date(created_at) > new Date(latestTweetDate)) {
+          //console.log(created_at > (latestTweetDate!))
+          // console.log("latest Tweet Date" + latestTweetDate > created_at )
+          if (!latestTweetDate || created_at > new Date(latestTweetDate)) {
             tweets.push({
               tweet_id,
               sortIndex,
@@ -168,15 +171,14 @@ export async function scrape() : Promise<boolean>{
     await initializeDiscord()
 
     const listXAccounts = config.xAccounts;
-    let tweets : Post[] = []
+    let tweets : Tweet[] = []
     for (const { handle, name } of listXAccounts) {
       console.log(`Fetching tweets for @${handle}...`); 
       console.log(name, handle)
       const posts = await getXAccountLatestPost(name, handle);
-
       for (const post of posts) {
-        if (post.tweet_id && post.sortIndex && post.profile && post.created_at && post.url && post.handle) {
-          console.log(post);
+        console.log(post.tweet_id)
+        if (post.tweet_id && post.sortIndex && post.created_at && post.url && post.handle) {
           const insertTweet = await postTweet(post);
           console.log(insertTweet)
           if (insertTweet) {

@@ -142,7 +142,7 @@ async function getXAccountLatestPost(name: string, handle: string): Promise<Twee
 
     try {
       console.log(`Navigating to https://x.com/${handle}`);
-      await page.goto(`https://x.com/${handle}`, { waitUntil: "load", timeout: 600000 });
+      await page.goto(`https://x.com/${handle}`, { waitUntil: "load", timeout: 500000 });
       await new Promise((resolve) => setTimeout(resolve, 15000));  // Wait for 15 seconds
     } catch (error) {
       console.error("Failed to navigate to page:", error);
